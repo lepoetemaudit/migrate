@@ -58,9 +58,8 @@ func New(url string) (Driver, error) {
 		}
 
 		return d, nil
-	} else {
-		return nil, errors.New(fmt.Sprintf("Driver '%s' not found.", u.Scheme))
 	}
+	return nil, fmt.Errorf("Driver '%s' not found.", u.Scheme)
 }
 
 // verifyFilenameExtension panics if the driver's filename extension
