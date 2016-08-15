@@ -1,29 +1,39 @@
 // Package main is the CLI.
 // You can use the CLI via Terminal.
-// import "github.com/mattes/migrate/migrate" for usage within Go.
+// import "github.com/gemnasium/migrate/migrate" for usage within Go.
 package main
 
 import (
 	"flag"
 	"fmt"
-	"github.com/fatih/color"
-	"github.com/mattes/migrate/file"
-	"github.com/mattes/migrate/migrate"
-	"github.com/mattes/migrate/migrate/direction"
-	pipep "github.com/mattes/migrate/pipe"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/fatih/color"
+	_ "github.com/gemnasium/migrate/driver/bash"
+	_ "github.com/gemnasium/migrate/driver/cassandra"
+	_ "github.com/gemnasium/migrate/driver/mongodb"
+	_ "github.com/gemnasium/migrate/driver/mysql"
+	_ "github.com/gemnasium/migrate/driver/postgres"
+	_ "github.com/gemnasium/migrate/driver/sqlite3"
+	"github.com/gemnasium/migrate/file"
+	"github.com/gemnasium/migrate/migrate"
+	"github.com/gemnasium/migrate/migrate/direction"
+	pipep "github.com/gemnasium/migrate/pipe"
 )
 
-var url = flag.String("url", "", "")
+var url = flag.String("url", os.Getenv("MIGRATE_URL"), "")
 var migrationsPath = flag.String("path", "", "")
 var version = flag.Bool("version", false, "Show migrate version")
 
 func main() {
+	flag.Usage = func() {
+		helpCmd()
+	}
+
 	flag.Parse()
 	command := flag.Arg(0)
-
 	if *version {
 		fmt.Println(Version)
 		os.Exit(0)
@@ -149,7 +159,8 @@ func main() {
 		fmt.Println(version)
 
 	default:
-		fallthrough
+		helpCmd()
+		os.Exit(1)
 	case "help":
 		helpCmd()
 	}
